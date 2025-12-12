@@ -1,0 +1,135 @@
+<!-- index.html (simplified, uses JSON) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji Semantic Search 🔍</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+        h1 { text-align: center; margin-bottom: 20px; }
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        input {
+            flex: 1;
+            padding: 12px 16px;
+            font-size: 18px;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            background: #161b22;
+            color: #c9d1d9;
+        }
+        input:focus { outline: none; border-color: #58a6ff; }
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover { background: #2ea043; }
+        button:disabled { background: #21262d; cursor: not-allowed; }
+        .status { text-align: center; padding: 20px; color: #8b949e; }
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+        }
+        .emoji-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.15s, border-color 0.15s;
+        }
+        .emoji-card:hover { transform: translateY(-2px); border-color: #58a6ff; }
+        .emoji { font-size: 36px; display: block; }
+        .name { font-size: 10px; color: #8b949e; display: block; margin-top: 4px; }
+        .score { font-size: 9px; color: #58a6ff; }
+        .hint { text-align: center; color: #6e7681; font-size: 12px; margin-top: 16px; }
+        .hint a { color: #58a6ff; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Emoji Search</h1>
+    <div class="search-box">
+        <input type="text" id="q" placeholder="Type to search... (happy, fire, love)" autofocus />
+        <button id="btn" disabled>Search</button>
+    </div>
+    <div id="status" class="status">Loading...</div>
+    <div id="results" class="results"></div>
+    <p class="hint">Built with <a href="https://github.com/lmmx/polars-fastembed">polars-fastembed</a></p>
+
+    <script type="module">
+        import { pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.1/dist/transformers.min.js';
+        
+        let data = [], embedder = null;
+        const $ = id => document.getElementById(id);
+        
+        const cosine = (a, b) => {
+            let d = 0, na = 0, nb = 0;
+            for (let i = 0; i < a.length; i++) { d += a[i]*b[i]; na += a[i]*a[i]; nb += b[i]*b[i]; }
+            return d / (Math.sqrt(na) * Math.sqrt(nb));
+        };
+        
+        async function init() {
+            $('status').textContent = 'Loading emojis...';
+            data = await fetch('./output/emojis.json').then(r => r.json());
+            
+            $('status').textContent = 'Loading model (first time ~30s)...';
+            embedder = await pipeline('feature-extraction', 'Xenova/bge-small-en-v1.5');
+            
+            $('status').textContent = `Ready! ${data.length} emojis loaded.`;
+            $('btn').disabled = false;
+        }
+        
+        async function search() {
+            const q = $('q').value.trim();
+            if (!q) return;
+            
+            $('btn').disabled = true;
+            $('status').textContent = 'Searching...';
+            
+            const out = await embedder(q, { pooling: 'mean', normalize: true });
+            const qe = Array.from(out.data);
+            
+            const results = data
+                .map(e => ({ ...e, s: cosine(qe, e.e) }))
+                .sort((a, b) => b.s - a.s)
+                .slice(0, 60);
+            
+            $('results').innerHTML = results.map(e => `
+                <div class="emoji-card" title="${e.d}">
+                    <span class="emoji">${e.c}</span>
+                    <span class="name">${e.n}</span>
+                    <span class="score">${(e.s * 100).toFixed(0)}%</span>
+                </div>
+            `).join('');
+            
+            $('status').textContent = `"${q}" → ${results.length} results`;
+            $('btn').disabled = false;
+        }
+        
+        $('btn').onclick = search;
+        $('q').onkeypress = e => e.key === 'Enter' && search();
+        
+        init().catch(e => $('status').textContent = `Error: ${e.message}`);
+    </script>
+</body>
+</html>

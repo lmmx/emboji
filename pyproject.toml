@@ -1,0 +1,21 @@
+[build-system]
+build-backend = "pdm.backend"
+requires = ["pdm-backend"]
+
+[project]
+name = "emboji"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Louis Maddox", email = "louismmx@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "numpy>=2.3.5",
+    "polars-fastembed[polars]>=0.1.3",
+    "umap-learn>=0.5.9.post2",
+]
+
+[project.scripts]
+emboji = "emboji:run"
