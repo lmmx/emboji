@@ -17,24 +17,24 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "numpy" },
-    { name = "polars-fastembed", extra = ["polars"] },
+    { name = "polars-fastembed", extra = ["cuda"] },
     { name = "umap-learn" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "numpy", specifier = ">=2.3.5" },
-    { name = "polars-fastembed", extras = ["polars"], specifier = ">=0.1.3" },
+    { name = "polars-fastembed", extras = ["cuda"], specifier = ">=0.1.10" },
     { name = "umap-learn", specifier = ">=0.5.9.post2" },
 ]
 
 [[package]]
 name = "joblib"
-version = "1.5.2"
+version = "1.5.3"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/e8/5d/447af5ea094b9e4c4054f82e223ada074c552335b9b4b2d14bd9b35a67c4/joblib-1.5.2.tar.gz", hash = "sha256:3faa5c39054b2f03ca547da9b2f52fde67c06240c31853f306aea97f13647b55", size = 331077, upload-time = "2025-08-27T12:15:46.575Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/41/f2/d34e8b3a08a9cc79a50b2208a93dce981fe615b64d5a4d4abee421d898df/joblib-1.5.3.tar.gz", hash = "sha256:8561a3269e6801106863fd0d6d84bb737be9e7631e33aaed3fb9ce5953688da3", size = 331603, upload-time = "2025-12-15T08:41:46.427Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1e/e8/685f47e0d754320684db4425a0967f7d3fa70126bffd76110b7009a0090f/joblib-1.5.2-py3-none-any.whl", hash = "sha256:4e1f0bdbb987e6d843c70cf43714cb276623def372df3c22fe5266b2670bc241", size = 308396, upload-time = "2025-08-27T12:15:45.188Z" },
+    { url = "https://files.pythonhosted.org/packages/7b/91/984aca2ec129e2757d1e4e3c81c3fcda9d0f85b74670a094cc443d9ee949/joblib-1.5.3-py3-none-any.whl", hash = "sha256:5fc3c5039fc5ca8c0276333a188bbd59d6b7ab37fe6632daa76bc7f9ec18e713", size = 309071, upload-time = "2025-12-15T08:41:44.973Z" },
 ]
 
 [[package]]
@@ -138,28 +138,53 @@ wheels = [
 ]
 
 [[package]]
-name = "polars-fastembed"
-version = "0.1.3"
+name = "polars-distance"
+version = "0.5.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "polars" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c5/c3/bfc8b7f2eecb5971f2c5b96a441fa9f9e642d3fd8b3e8436d9af11a59c00/polars_fastembed-0.1.3.tar.gz", hash = "sha256:d93540f95d19722c60f80d2b3c292091c2ff1b659b63a802efe78a99fb76a29e", size = 41528, upload-time = "2025-03-04T12:41:12.803Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f4/89/c689e461dffc5eeded2927cb214aae20f1103ff5e2b5e0c7042dff81f74c/polars_distance-0.5.3.tar.gz", hash = "sha256:26b7fbfc38de1c81b847ffa87b4f106dd10d4585a2240fff882e0f1fcb1acad8", size = 38226, upload-time = "2025-04-20T09:10:50.27Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/20/b0/dfc457396618e05909254435d3d3f9db6bbdf4e57ed287bf20701d90b3a1/polars_fastembed-0.1.3-cp38-abi3-macosx_10_12_x86_64.whl", hash = "sha256:d0f55478c240dff634502e7040f5c279a61ca05214c3d8d11ed39e7e533a3305", size = 11269912, upload-time = "2025-03-04T12:40:49.098Z" },
-    { url = "https://files.pythonhosted.org/packages/70/91/4e4734996f80564346d1fda398facce361e40308b772d4e229ea4fb06ac3/polars_fastembed-0.1.3-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:f38cf55fce9b0966bbcd5fb74ec28a01330e98f85ca7513ddd9ead93fb2bb3d7", size = 9457518, upload-time = "2025-03-04T12:41:01.656Z" },
-    { url = "https://files.pythonhosted.org/packages/62/ed/6d8a9276692a56bc6a3f710e3545f7fd14bc8ea07845c69037d9434f9697/polars_fastembed-0.1.3-cp38-abi3-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:6d9df7a8ad1d7c7c01bec2dd4dba57658c476e994b3e0c37f2041e11e6f0559d", size = 14098595, upload-time = "2025-03-04T12:40:53.109Z" },
-    { url = "https://files.pythonhosted.org/packages/a8/17/60afdda388ea0e59461afe309504bdd116227a58229a968938cbbf4b3b0c/polars_fastembed-0.1.3-cp38-abi3-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:1d8f2fee2cd85d4d15237241327ed8d396c0c1cee529b99b021fe66c21319a26", size = 18283776, upload-time = "2025-03-04T12:41:06.605Z" },
-    { url = "https://files.pythonhosted.org/packages/1a/6b/9e56993a55e9acb586202252b3372d67f4a2867b0a907bb19ffb59bb1576/polars_fastembed-0.1.3-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:26986687fb8feda26234710ee48826dce9083653d1ad0aabfcded3e9d76f1f7c", size = 15369120, upload-time = "2025-03-04T12:40:39.994Z" },
-    { url = "https://files.pythonhosted.org/packages/11/c7/c16c80453c31821ab1396b2df3d432197d244229b2173ae7a595681f226b/polars_fastembed-0.1.3-cp38-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:9768ec9b1c4f92bc1ce4320de4b76b8068a7d57e9157cf53d57fa02334dd45fc", size = 13505642, upload-time = "2025-03-04T12:40:57.633Z" },
-    { url = "https://files.pythonhosted.org/packages/d2/86/49a49d5728be8a61676f4602348b36068eda7c99cfba292e15ec31e39742/polars_fastembed-0.1.3-cp38-abi3-manylinux_2_28_i686.whl", hash = "sha256:8bee0535456b0b747763067a616b4867f14abf19ba4913cd9236a9b2c0089746", size = 16342306, upload-time = "2025-03-04T12:41:10.702Z" },
-    { url = "https://files.pythonhosted.org/packages/96/dd/48e6b3f31f91f37720cfbc9fa1cbcb6f422c2039ad0a39a46b55d30a8a6a/polars_fastembed-0.1.3-cp38-abi3-manylinux_2_34_ppc64le.whl", hash = "sha256:6d66a61f13b97c3629d69e87149b5a79556ceca527bc86b197e32a88ad8bf52d", size = 16157635, upload-time = "2025-03-04T12:40:45.011Z" },
-    { url = "https://files.pythonhosted.org/packages/7f/33/fd5c1e804eaf852a4fd5350291d0d077850e84d50d012ee6a82fe7373028/polars_fastembed-0.1.3-cp38-abi3-win_amd64.whl", hash = "sha256:93f18767857bbdc8351bcda58cb6f637373349cfb92c4017f4c02dd5e005c6e4", size = 10982412, upload-time = "2025-03-04T12:40:36.435Z" },
+    { url = "https://files.pythonhosted.org/packages/c3/cb/55546cb7eaf22ab5d25df6f863f79dcfe6545c2889a12d1136b833c80388/polars_distance-0.5.3-cp38-abi3-macosx_10_12_x86_64.whl", hash = "sha256:80c01b3210588987d917d85db2a0c12fb9ab5a71d6a7c519e318be139ef6ad5a", size = 5412548, upload-time = "2025-04-20T09:10:48.571Z" },
+    { url = "https://files.pythonhosted.org/packages/c7/07/495504f4c42b4fb22162267b3ac6abe9f0665001547f4d54226c7d52434d/polars_distance-0.5.3-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:a47c033d1b9bcf376d8d15d74f0ad60bf98594fad08ca906c1f4b93907e19104", size = 4836127, upload-time = "2025-04-20T09:10:47.156Z" },
+    { url = "https://files.pythonhosted.org/packages/65/7b/d099a1ac0a8f06cd4b184cdb575004696d902142ec0e9f8dafa02b9c94d6/polars_distance-0.5.3-cp38-abi3-manylinux_2_12_i686.manylinux2010_i686.whl", hash = "sha256:2bcf6f32ebf7b8efa258393ea58175abf5844379cc9acf239767927fe989aada", size = 5860321, upload-time = "2025-04-20T09:10:43.36Z" },
+    { url = "https://files.pythonhosted.org/packages/4e/77/b2476cfde9a0ec2e00f4cea5ab9db668b31cf61236377be8dd53f28538a1/polars_distance-0.5.3-cp38-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:6c73567844fcf354b6e3387beb1253130d1fa09969100af5c51016f9e55f506d", size = 4962912, upload-time = "2025-04-20T09:10:37.975Z" },
+    { url = "https://files.pythonhosted.org/packages/94/82/16f10aefc3b1d87050cc29fc1dc3e9c18b8ec557742da53e02a25fcbf902/polars_distance-0.5.3-cp38-abi3-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:21ca13be28d7a4e220a8a5d7276e6dfda6a507e799cfb714ac3c016bbcbd2ce9", size = 5503483, upload-time = "2025-04-20T09:10:40.058Z" },
+    { url = "https://files.pythonhosted.org/packages/fc/3d/f08df8558489ba66401a3ba382c11a0f9b3d225ba100e8e1511991f272f0/polars_distance-0.5.3-cp38-abi3-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:bdfc5b840389a266e3b850a1320037c1a9419b0e58ab45dc01889dc8948870be", size = 5828726, upload-time = "2025-04-20T09:10:41.502Z" },
+    { url = "https://files.pythonhosted.org/packages/c3/a4/cba0275a1cc313507de399c01ff695df6e84a9164f7ece5615ce30c0b0f8/polars_distance-0.5.3-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:bbdba9190b1b34f1c609540ac0d2a34be3563fb6d0f751ad1e2ed916dbd7c6fb", size = 5420779, upload-time = "2025-04-20T09:10:45.307Z" },
+    { url = "https://files.pythonhosted.org/packages/54/ed/5ff29878c01a153c4fcbd08668bd200c12430ed80a4cfd04ccff78046326/polars_distance-0.5.3-cp38-abi3-win32.whl", hash = "sha256:59d21c12c4ef628f201ba7ed815015c1dcf0be842984275923fab03e89bfe02c", size = 5131706, upload-time = "2025-04-20T09:10:53.576Z" },
+    { url = "https://files.pythonhosted.org/packages/4e/02/9658eee9c2a47013ee9def21cc8917b946503db8f5eea098da72b91288cd/polars_distance-0.5.3-cp38-abi3-win_amd64.whl", hash = "sha256:48e90994ae0e7945572a6d70f7711cb2d9101ea338fa993488d405e7492ab389", size = 5527949, upload-time = "2025-04-20T09:10:51.468Z" },
+]
+
+[[package]]
+name = "polars-fastembed"
+version = "0.1.10"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "polars" },
+    { name = "polars-distance" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c7/a1/1bcda8950290fe1ba318c40a617e4d5528deae4549400625a1997425c4a8/polars_fastembed-0.1.10.tar.gz", hash = "sha256:91a0aec975331306dd566607f376d2ea21aea6f6d1e90155be55ca69ec9ecc65", size = 109652, upload-time = "2025-12-17T19:11:53.585Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/24/10/8166f7250c9d2fb26c2aa68f0209104f53ead381a45b824e2d86926d60f9/polars_fastembed-0.1.10-cp38-abi3-macosx_10_12_x86_64.whl", hash = "sha256:2c27796b0f92f213a3a315388557c7919edf5820f4a58e2e1583be760e233667", size = 5354616, upload-time = "2025-12-17T19:11:52.028Z" },
+    { url = "https://files.pythonhosted.org/packages/f8/97/a82514f3b6a293de16027a5b170383af5c540e8d0ede137143fb4b9232a0/polars_fastembed-0.1.10-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:b50a84805d176de74b48d29255dab297f3a329955b79207902e7520d7f883c38", size = 4635301, upload-time = "2025-12-17T19:11:50.147Z" },
+    { url = "https://files.pythonhosted.org/packages/c9/1d/bacff67c8adf3ee2569b25ee34f721e27d8f9a17be58187f9cf72ea03665/polars_fastembed-0.1.10-cp38-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:3efd45331dcfc93dfbd2486b7b41032abe2d941aa1865ae2ea0490a38d1cb759", size = 7175835, upload-time = "2025-12-17T19:11:40.619Z" },
+    { url = "https://files.pythonhosted.org/packages/de/e8/97cd5dec9a4b826820145567f933d85b2e2369667db7c05317ac8e4c6d55/polars_fastembed-0.1.10-cp38-abi3-manylinux_2_28_i686.whl", hash = "sha256:a89d224ef638ab42b6401812fa1a3751048abd5a6621096919d8176bc14339da", size = 7399882, upload-time = "2025-12-17T19:11:48.134Z" },
+    { url = "https://files.pythonhosted.org/packages/91/d0/ff5072445b1935c12607641fe673cdb5329c3fadeb29407243f1bb63e590/polars_fastembed-0.1.10-cp38-abi3-win_amd64.whl", hash = "sha256:bbc0b46320d661bcab75629cb120e2ec6b8c9201bf2f29189e173e4ebbe2856c", size = 5231421, upload-time = "2025-12-17T19:11:55.026Z" },
 ]
 
 [package.optional-dependencies]
-polars = [
-    { name = "polars" },
+cuda = [
+    { name = "polars-fastembed-cuda" },
+]
+
+[[package]]
+name = "polars-fastembed-cuda"
+version = "0.1.10"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/29/10/06818837448a376fcf37b5025518518b0c73b7412df0171a79eb2b44f33e/polars_fastembed_cuda-0.1.10-py3-none-manylinux_2_17_x86_64.whl", hash = "sha256:7c55e89c339dbc796240a03a385c8aa169be1fbe77abd5b72a680a12646bb356", size = 40270390, upload-time = "2025-12-17T18:54:03.569Z" },
 ]
 
 [[package]]

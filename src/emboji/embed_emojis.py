@@ -11,7 +11,7 @@ import polars as pl
 from polars_fastembed import register_model
 from umap import UMAP
 
-MODEL_ID = "BAAI/bge-small-en-v1.5"
+MODEL_ID = "snowflake/snowflake-arctic-embed-xs"
 HF_DATASET = "badrex/LLM-generated-emoji-descriptions"
 OUTPUT_DIR = Path("output")
 

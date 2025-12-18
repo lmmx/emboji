@@ -93,7 +93,7 @@
             data = await fetch('./output/emojis.json').then(r => r.json());
             
             $('status').textContent = 'Loading model (first time ~30s)...';
-            embedder = await pipeline('feature-extraction', 'Xenova/bge-small-en-v1.5');
+            embedder = await pipeline('feature-extraction', 'snowflake/snowflake-arctic-embed-xs');
             
             $('status').textContent = `Ready! ${data.length} emojis loaded.`;
             $('btn').disabled = false;
