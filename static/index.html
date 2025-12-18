@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emboji - Semantic Emoji Search</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        h1 {
+            font-size: 20px;
+            white-space: nowrap;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 8px;
+            flex: 1;
+            min-width: 280px;
+            max-width: 500px;
+        }
+
+        input {
+            flex: 1;
+            padding: 10px 14px;
+            font-size: 16px;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            background: #161b22;
+            color: #c9d1d9;
+        }
+
+        input:focus { outline: none; border-color: #58a6ff; }
+
+        button {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        button:hover { background: #2ea043; }
+
+        .status {
+            font-size: 13px;
+            color: #8b949e;
+        }
+
+        main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .plot-container {
+            flex: 1;
+            position: relative;
+            border-right: 1px solid #30363d;
+            min-width: 0;
+        }
+
+        #plot {
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+
+        #plot:active { cursor: grabbing; }
+
+        .sidebar {
+            width: 340px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #30363d;
+            font-size: 13px;
+            color: #8b949e;
+        }
+
+        .results {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 8px;
+            align-content: start;
+        }
+
+        .emoji-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 10px 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.15s, border-color 0.15s, background 0.15s;
+        }
+
+        .emoji-card:hover {
+            transform: translateY(-2px);
+            border-color: #58a6ff;
+            background: #1c2128;
+        }
+
+        .emoji-card.highlighted {
+            border-color: #f78166;
+            background: #2d1f1f;
+        }
+
+        .emoji { font-size: 32px; display: block; }
+        .name { font-size: 9px; color: #8b949e; display: block; margin-top: 4px; line-height: 1.2; }
+        .score { font-size: 9px; color: #58a6ff; margin-top: 2px; }
+
+        .tooltip {
+            position: fixed;
+            background: #1c2128;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            pointer-events: none;
+            z-index: 1000;
+            max-width: 250px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            display: none;
+        }
+
+        .tooltip .emoji { font-size: 24px; }
+        .tooltip .name { font-size: 12px; color: #c9d1d9; margin-top: 4px; }
+
+        footer {
+            padding: 12px 24px;
+            border-top: 1px solid #30363d;
+            font-size: 12px;
+            color: #6e7681;
+            text-align: center;
+        }
+
+        footer a { color: #58a6ff; text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 800px) {
+            main { flex-direction: column; }
+            .plot-container { height: 50vh; border-right: none; border-bottom: 1px solid #30363d; }
+            .sidebar { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🔍 Emboji</h1>
+        <div class="search-box">
+            <input type="text" id="q" placeholder="Search emojis... (happy, fire, love, crying)" autofocus />
+            <button id="btn">Search</button>
+        </div>
+        <span class="status" id="status">Loading...</span>
+    </header>
+
+    <main>
+        <div class="plot-container">
+            <canvas id="plot"></canvas>
+        </div>
+        <aside class="sidebar">
+            <div class="sidebar-header" id="results-header">Search results</div>
+            <div class="results" id="results"></div>
+        </aside>
+    </main>
+
+    <div class="tooltip" id="tooltip">
+        <span class="emoji"></span>
+        <span class="name"></span>
+    </div>
+
+    <footer>
+        Built with <a href="https://github.com/lmmx/polars-fastembed">polars-fastembed</a>
+    </footer>
+
+    <script>
+        const $ = id => document.getElementById(id);
+        const canvas = $('plot');
+        const ctx = canvas.getContext('2d');
+        const tooltip = $('tooltip');
+
+        let allEmojis = [];
+        let searchResults = new Set();
+        let transform = { x: 0, y: 0, scale: 1 };
+        let isDragging = false;
+        let dragStart = { x: 0, y: 0 };
+        let bounds = { minX: 0, maxX: 0, minY: 0, maxY: 0 };
+
+        // Debounce helper
+        function debounce(fn, ms) {
+            let timeout;
+            return (...args) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => fn(...args), ms);
+            };
+        }
+
+        // Load all emojis for the plot
+        async function loadEmojis() {
+            $('status').textContent = 'Loading emojis...';
+            const res = await fetch('/api/emojis');
+            allEmojis = await res.json();
+
+            // Calculate bounds
+            bounds.minX = Math.min(...allEmojis.map(e => e.x));
+            bounds.maxX = Math.max(...allEmojis.map(e => e.x));
+            bounds.minY = Math.min(...allEmojis.map(e => e.y));
+            bounds.maxY = Math.max(...allEmojis.map(e => e.y));
+
+            $('status').textContent = `${allEmojis.length} emojis loaded`;
+            resetView();
+            render();
+        }
+
+        // Convert data coords to screen coords
+        function toScreen(x, y) {
+            const padding = 40;
+            const w = canvas.width - padding * 2;
+            const h = canvas.height - padding * 2;
+            const dataW = bounds.maxX - bounds.minX;
+            const dataH = bounds.maxY - bounds.minY;
+
+            const sx = padding + ((x - bounds.minX) / dataW) * w;
+            const sy = padding + ((y - bounds.minY) / dataH) * h;
+
+            return {
+                x: (sx - canvas.width / 2) * transform.scale + canvas.width / 2 + transform.x,
+                y: (sy - canvas.height / 2) * transform.scale + canvas.height / 2 + transform.y
+            };
+        }
+
+        // Convert screen coords to data coords
+        function toData(sx, sy) {
+            const padding = 40;
+            const w = canvas.width - padding * 2;
+            const h = canvas.height - padding * 2;
+            const dataW = bounds.maxX - bounds.minX;
+            const dataH = bounds.maxY - bounds.minY;
+
+            const cx = (sx - transform.x - canvas.width / 2) / transform.scale + canvas.width / 2;
+            const cy = (sy - transform.y - canvas.height / 2) / transform.scale + canvas.height / 2;
+
+            return {
+                x: ((cx - padding) / w) * dataW + bounds.minX,
+                y: ((cy - padding) / h) * dataH + bounds.minY
+            };
+        }
+
+        function resetView() {
+            transform = { x: 0, y: 0, scale: 1 };
+        }
+
+        function render() {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+
+            ctx.fillStyle = '#0d1117';
+            ctx.fillRect(0, 0, rect.width, rect.height);
+
+            const fontSize = Math.max(12, 18 * transform.scale);
+            ctx.font = `${fontSize}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // Draw non-highlighted first
+            for (const e of allEmojis) {
+                if (searchResults.size > 0 && searchResults.has(e.c)) continue;
+                const pos = toScreen(e.x, e.y);
+                if (pos.x < -20 || pos.x > rect.width + 20 || pos.y < -20 || pos.y > rect.height + 20) continue;
+                ctx.globalAlpha = searchResults.size > 0 ? 0.2 : 0.8;
+                ctx.fillText(e.c, pos.x, pos.y);
+            }
+
+            // Draw highlighted on top
+            if (searchResults.size > 0) {
+                ctx.globalAlpha = 1;
+                for (const e of allEmojis) {
+                    if (!searchResults.has(e.c)) continue;
+                    const pos = toScreen(e.x, e.y);
+                    ctx.fillText(e.c, pos.x, pos.y);
+                }
+            }
+
+            ctx.globalAlpha = 1;
+        }
+
+        // Search
+        async function search() {
+            const q = $('q').value.trim();
+            if (!q) {
+                searchResults.clear();
+                $('results').innerHTML = '';
+                $('results-header').textContent = 'Search results';
+                render();
+                return;
+            }
+
+            $('status').textContent = 'Searching...';
+            $('btn').disabled = true;
+
+            try {
+                const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&k=60`);
+                const results = await res.json();
+
+                searchResults = new Set(results.map(r => r.c));
+
+                $('results').innerHTML = results.map(e => `
+                    <div class="emoji-card" data-emoji="${e.c}" title="${e.d}">
+                        <span class="emoji">${e.c}</span>
+                        <span class="name">${e.n}</span>
+                        <span class="score">${(e.s * 100).toFixed(0)}%</span>
+                    </div>
+                `).join('');
+
+                $('results-header').textContent = `"${q}" → ${results.length} results`;
+                $('status').textContent = `${allEmojis.length} emojis loaded`;
+
+                render();
+            } catch (err) {
+                $('status').textContent = `Error: ${err.message}`;
+            }
+
+            $('btn').disabled = false;
+        }
+
+        // Event handlers
+        $('btn').onclick = search;
+        $('q').onkeypress = e => { if (e.key === 'Enter') search(); };
+
+        // Clear search on empty input
+        $('q').oninput = debounce(() => {
+            if ($('q').value.trim() === '') {
+                searchResults.clear();
+                $('results').innerHTML = '';
+                $('results-header').textContent = 'Search results';
+                render();
+            }
+        }, 200);
+
+        // Click on result card to copy emoji
+        $('results').onclick = e => {
+            const card = e.target.closest('.emoji-card');
+            if (card) {
+                const emoji = card.dataset.emoji;
+                navigator.clipboard.writeText(emoji);
+                $('status').textContent = `Copied ${emoji}!`;
+                setTimeout(() => $('status').textContent = `${allEmojis.length} emojis loaded`, 1500);
+            }
+        };
+
+        // Pan
+        canvas.onmousedown = e => {
+            isDragging = true;
+            dragStart = { x: e.clientX - transform.x, y: e.clientY - transform.y };
+        };
+
+        window.onmousemove = e => {
+            if (isDragging) {
+                transform.x = e.clientX - dragStart.x;
+                transform.y = e.clientY - dragStart.y;
+                render();
+            }
+
+            // Tooltip
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+
+            let closest = null;
+            let closestDist = 20 / transform.scale;
+
+            for (const em of allEmojis) {
+                const pos = toScreen(em.x, em.y);
+                const d = Math.hypot(pos.x - mx, pos.y - my);
+                if (d < closestDist) {
+                    closestDist = d;
+                    closest = em;
+                }
+            }
+
+            if (closest) {
+                tooltip.style.display = 'block';
+                tooltip.style.left = (e.clientX + 12) + 'px';
+                tooltip.style.top = (e.clientY + 12) + 'px';
+                tooltip.querySelector('.emoji').textContent = closest.c;
+                tooltip.querySelector('.name').textContent = closest.n;
+            } else {
+                tooltip.style.display = 'none';
+            }
+        };
+
+        window.onmouseup = () => { isDragging = false; };
+
+        // Zoom
+        canvas.onwheel = e => {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+
+            const zoom = e.deltaY > 0 ? 0.9 : 1.1;
+            const newScale = Math.max(0.5, Math.min(10, transform.scale * zoom));
+
+            // Zoom toward cursor
+            transform.x = mx - (mx - transform.x) * (newScale / transform.scale);
+            transform.y = my - (my - transform.y) * (newScale / transform.scale);
+            transform.scale = newScale;
+
+            render();
+        };
+
+        // Resize
+        window.onresize = debounce(render, 100);
+
+        // Double-click to reset view
+        canvas.ondblclick = () => {
+            resetView();
+            render();
+        };
+
+        // Init
+        loadEmojis().catch(err => {
+            $('status').textContent = `Error: ${err.message}`;
+        });
+    </script>
+</body>
+</html>

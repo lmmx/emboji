@@ -5,7 +5,7 @@ requires = ["pdm-backend"]
 [project]
 name = "emboji"
 version = "0.1.0"
-description = "Add your description here"
+description = "Emoji semantic search powered by polars-fastembed"
 readme = "README.md"
 authors = [
     { name = "Louis Maddox", email = "louismmx@gmail.com" }
@@ -15,7 +15,15 @@ dependencies = [
     "numpy>=2.3.5",
     "polars-fastembed[cuda]>=0.1.10",
     "umap-learn>=0.5.9.post2",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.34.0",
 ]
 
 [project.scripts]
-emboji = "emboji:run"
+emboji-embed = "emboji:run_embed"
+emboji-serve = "emboji:run_serve"
+
+[dependency-groups]
+dev = [
+    "ty>=0.0.3",
+]
