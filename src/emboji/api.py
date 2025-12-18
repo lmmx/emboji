@@ -48,7 +48,7 @@ app = FastAPI(title="Emboji", description="Emoji semantic search", lifespan=life
 
 
 @app.get("/api/search")
-def search(q: str = Query(..., min_length=1), k: int = Query(60, ge=1, le=200)):
+def search(q: str = Query(..., min_length=1), k: int = Query(100, ge=1, le=200)):
     """
     Semantic search over emojis.
     Returns top k results with similarity scores.
