@@ -280,42 +280,48 @@
             transform = { x: 0, y: 0, scale: 1 };
         }
 
-        function render() {
-            const dpr = window.devicePixelRatio || 1;
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+	function render() {
+	    const dpr = window.devicePixelRatio || 1;
+	    const rect = canvas.getBoundingClientRect();
+	    canvas.width = rect.width * dpr;
+	    canvas.height = rect.height * dpr;
+	    ctx.scale(dpr, dpr);
 
-            ctx.fillStyle = '#0d1117';
-            ctx.fillRect(0, 0, rect.width, rect.height);
+	    ctx.fillStyle = '#0d1117';
+	    ctx.fillRect(0, 0, rect.width, rect.height);
 
-            const fontSize = Math.max(12, 18 * transform.scale);
-            ctx.font = `${fontSize}px sans-serif`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
+	    const fontSize = Math.max(12, 18 * transform.scale);
+	    ctx.font = `${fontSize}px sans-serif`;
+	    ctx.textAlign = 'center';
+	    ctx.textBaseline = 'middle';
 
-            // Draw non-highlighted first
-            for (const e of allEmojis) {
-                if (searchResults.size > 0 && searchResults.has(e.c)) continue;
-                const pos = toScreen(e.x, e.y);
-                if (pos.x < -20 || pos.x > rect.width + 20 || pos.y < -20 || pos.y > rect.height + 20) continue;
-                ctx.globalAlpha = searchResults.size > 0 ? 0.2 : 0.8;
-                ctx.fillText(e.c, pos.x, pos.y);
-            }
+	    const hasSearch = searchResults.size > 0;
 
-            // Draw highlighted on top
-            if (searchResults.size > 0) {
-                ctx.globalAlpha = 1;
-                for (const e of allEmojis) {
-                    if (!searchResults.has(e.c)) continue;
-                    const pos = toScreen(e.x, e.y);
-                    ctx.fillText(e.c, pos.x, pos.y);
-                }
-            }
+	    // Draw non-highlighted emojis (faded when search active)
+	    ctx.globalAlpha = hasSearch ? 0.01 : 0.7;
+	    for (const e of allEmojis) {
+		if (hasSearch && searchResults.has(e.c)) continue;
+		const pos = toScreen(e.x, e.y);
+		if (pos.x < -20 || pos.x > rect.width + 20 || pos.y < -20 || pos.y > rect.height + 20) continue;
+		ctx.fillText(e.c, pos.x, pos.y);
+	    }
 
-            ctx.globalAlpha = 1;
-        }
+	    // Draw highlighted emojis on top (fully opaque, slightly larger)
+	    if (hasSearch) {
+		ctx.globalAlpha = 1;
+		const highlightFontSize = Math.max(16, 24 * transform.scale);
+		ctx.font = `${highlightFontSize}px sans-serif`;
+
+		for (const e of allEmojis) {
+		    if (!searchResults.has(e.c)) continue;
+		    const pos = toScreen(e.x, e.y);
+		    if (pos.x < -20 || pos.x > rect.width + 20 || pos.y < -20 || pos.y > rect.height + 20) continue;
+		    ctx.fillText(e.c, pos.x, pos.y);
+		}
+	    }
+
+	    ctx.globalAlpha = 1;
+	}
 
         // Search
         async function search() {

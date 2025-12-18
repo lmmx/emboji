@@ -25,16 +25,9 @@ def run():
     print(f"\nRegistering model: {MODEL_ID}")
     register_model(MODEL_ID, providers=["CUDAExecutionProvider"])
 
-    # Combine text fields for richer embeddings
+    # Lowercase the short description for better embeddings
     df = df.with_columns(
-        pl.concat_str(
-            [
-                pl.col("short description"),
-                pl.col("tags").list.join(", "),
-                pl.col("LLM description"),
-            ],
-            separator=" | ",
-        ).alias("text_to_embed")
+        pl.col("short description").str.to_lowercase().alias("text_to_embed")
     )
 
     print("\nEmbedding...")
@@ -58,7 +51,6 @@ def run():
     df_final.write_parquet(parquet_path)
     print(f"\nSaved: {parquet_path}")
     print(f"Size: {parquet_path.stat().st_size / 1024 / 1024:.2f} MB")
-    print(f"\nRun 'emboji-serve' to start the search API")
 
 
 if __name__ == "__main__":

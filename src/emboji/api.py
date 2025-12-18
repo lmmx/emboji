@@ -18,6 +18,8 @@ BASE_DIR = Path(__file__).parents[2]
 OUTPUT_DIR = BASE_DIR / "output"
 STATIC_DIR = BASE_DIR / "static"
 
+QUERY_PREFIX = "Represent this sentence for searching relevant passages: "
+
 # Global state
 df: pl.DataFrame
 
@@ -50,7 +52,7 @@ def search(q: str = Query(..., min_length=1), k: int = Query(60, ge=1, le=200)):
     Returns top k results with similarity scores.
     """
     result = df.fastembed.retrieve(
-        query=q,
+        query=f"{QUERY_PREFIX}{q}",
         model_name=MODEL_ID,
         embedding_column="embedding",
         k=k,
