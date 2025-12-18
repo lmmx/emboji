@@ -23,7 +23,9 @@ def run():
     print(f"Loaded {len(df)} emojis")
 
     print(f"\nRegistering model: {MODEL_ID}")
-    register_model(MODEL_ID, providers=["CUDAExecutionProvider"])
+    register_model(
+        MODEL_ID, providers=["CUDAExecutionProvider", "CPUExecutionProvider"]
+    )
 
     # Lowercase the short description for better embeddings
     df = df.with_columns(

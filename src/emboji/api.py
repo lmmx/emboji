@@ -28,7 +28,9 @@ df: pl.DataFrame
 async def lifespan(app: FastAPI):
     global df
     print(f"Registering model: {MODEL_ID}")
-    register_model(MODEL_ID, providers=["CUDAExecutionProvider"])
+    register_model(
+        MODEL_ID, providers=["CUDAExecutionProvider", "CPUExecutionProvider"]
+    )
 
     parquet_path = OUTPUT_DIR / "emoji_embeddings.parquet"
     if not parquet_path.exists():
